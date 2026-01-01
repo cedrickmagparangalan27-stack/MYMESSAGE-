@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bestie Surprise 💜</title>
+
+<style>
+* { box-sizing: border-box; font-family: Arial, sans-serif; }
+
+body {
+  margin: 0;
+  height: 100vh;
+  background: linear-gradient(135deg, #7b2cff, #ff4ecd, #000);
+  background-size: 300% 300%;
+  animation: bgMove 8s ease infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  overflow: hidden;
+}
+
+@keyframes bgMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.card {
+  width: 90%;
+  max-width: 380px;
+  background: rgba(0,0,0,0.75);
+  border-radius: 26px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 0 40px rgba(200,100,255,0.8);
+  transition: transform 0.2s;
+}
+
+h1 { color: #ff9dff; }
+
+/* PASSCODE */
+.code-boxes {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.box {
+  width: 50px;
+  height: 55px;
+  border-radius: 12px;
+  border: 2px solid #ff9dff;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.box.filled {
+  background: linear-gradient(135deg, #8e2de2, #ff4ecd);
+  transform: scale(1.1);
+}
+
+/* KEYPAD */
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.key {
+  padding: 18px 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #1f1f1f, #3a0ca3);
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(150,80,255,0.6);
+}
+
+.key:active {
+  transform: scale(0.92);
+  background: linear-gradient(135deg, #ff4ecd, #8e2de2);
+}
+
+.hidden { display: none; }
+
+.mail { font-size: 64px; cursor: pointer; }
+
+/* EMOJIS */
+.emoji {
+  position: absolute;
+  font-size: 28px;
+  animation: floatUp 1.5s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-120px) scale(1.4); opacity: 0; }
+}
+
+/* UNLOCK */
+@keyframes unlockFlash {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); box-shadow: 0 0 80px rgba(255,120,255,1); }
+  100% { transform: scale(1); }
+}
+
+.unlock-anim {
+  animation: unlockFlash 0.6s ease;
+}
+
+/* ❌ WRONG PASSWORD SHAKE */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(10px); }
+  60% { transform: translateX(-10px); }
+  80% { transform: translateX(10px); }
+  100% { transform: translateX(0); }
+}
+
+.shake {
+  animation: shake 0.4s;
+}
+
+/* MESSAGE */
+#messageScreen {
+  max-height: 85vh;
+}
+
+#messageText {
+  max-height: 55vh;
+  overflow-y: auto;
+  text-align: left;
+  line-height: 1.6;
+  font-size: 15px;
+  white-space: pre-line;
+  padding-right: 6px;
+}
+
+#messageText::-webkit-scrollbar {
+  width: 4px;
+}
+#messageText::-webkit-scrollbar-thumb {
+  background: #ff9dff;
+  border-radius: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOCK -->
+<div class="card" id="lockScreen">
+  <h1>🔒 Enter Passcode</h1>
+  <p>Hint: a special date 💜</p>
+
+  <div class="code-boxes">
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+  </div>
+
+  <div class="keypad">
+    <div class="key" onclick="press(1)">1</div>
+    <div class="key" onclick="press(2)">2</div>
+    <div class="key" onclick="press(3)">3</div>
+    <div class="key" onclick="press(4)">4</div>
+    <div class="key" onclick="press(5)">5</div>
+    <div class="key" onclick="press(6)">6</div>
+    <div class="key" onclick="press(7)">7</div>
+    <div class="key" onclick="press(8)">8</div>
+    <div class="key" onclick="press(9)">9</div>
+    <div></div>
+    <div class="key" onclick="press(0)">0</div>
+    <div class="key" onclick="clearCode()">⌫</div>
+  </div>
+</div>
+
+<!-- MAIL -->
+<div class="card hidden" id="mailScreen">
+  <h1>💜 Unlocked 💜</h1>
+  <p>Open the mail</p>
+  <div class="mail" onclick="openMail()">💌</div>
+</div>
+
+<!-- MESSAGE -->
+<div class="card hidden" id="messageScreen">
+  <h1>✨ Readwell ✨</h1>
+  <p id="messageText">
+What i wanna do after i finished and graduated and have a successful life, what's comes to my mind first was I wanna travel with you in Switzerland🥹 that's my new goal i want to go to Switzerland coz I miss our very first house and how I lived when I was alone,walang kalaro,walang same age na kapitbahay like para akong nasa loob lang ng Paradiso kasama yung sarili ko nag lalaro mag Isa🧸 tumatawa mag Isa😆 nanonood mag Isa📺 nag duduyan mag Isa while nakatingin sa langit☁️ but then I realized na i was crying pala dati😿 dahil I don't have any friends when I was a child and also nung elem ako nung kinder and grade 1 palagi ako exited pumasok sa school kasi it's my time to be with others🥺 that's how i developed yung trauma ko na ayaw ko maging alone🤕 pls don't leave me🥺 i don't have any friends to tell what has happening to my life and no other friends that will comfort me when i was sad,if you think i have friends in school i don't have they just know my background like who am i not what ive done for and what's my problem unlike you coz you know everything about me🥺 pls don't leave me🥺 were almost near to get finished to school and earn some money and go to Switzerland because i really think If you leave me you will look at me like you never met me🤕, you will not look at me because you will think im just a stranger, iwanna say to you i have so much many dream about you leave me and you don't want to talk to me again💔, i see it in my dreams so many times, you and me we are promising to go to Switzerland together no one will left out🤞🏻i promise it to you and you also promised it to me🤝 so you not leaving me again, i hope if i have a dream again and if you were there i hope it's not about leaving me again but instead the dream should be about we become successful and go to places we want where we have freedom and peace, yk when i was washing plates and the house chores every morning hahaha my mind+music takes me to other places while cleaning, my body is just moving without my control and my mind is see freedom nasa roses fields ako and nasa mountain looking at the sun going down is it funny right? Coz it's not possible but in me it's actually what i see sometimes, if your power is your eyes my power is vision in my mind you believe it or not it happens to me🥰 and it makes me delighted, but sometimes I wish i could turn back in time and i will forget all what happend it's because it feel i got so many responsibilities im still a child it is funny right you can laugh but i think im being childish it is because di ko na enjoy yung childhood ko kasi when i play with other kids when i was Elementary palagi akong pinapagalitan and pinapauwi and yon pinapatulog ako the whole noon every single day and sumabay pa yung nag lockdown ayon wala na talaga akong freedom kasi yung ibang mga bata nag lalaro sa labas Tas ako hanggang dito lang samin yeah i know it's because it's about my safety but for me para akong inagawan ng karapatan since i was a child and siguro that's why i was still being childish till now parang mood swing yung personality ko kasi minsan serious na tao Tas biglang magiging makulit🤕😿 siguro that's why when i talk to my problems sa mga cm ko di sila nakikinig kasi baka nasa isip nila weirdo ako but that's just okay if they are against me that's okay i will just accept it it's because im being used to it im always forgiving things that always making me down but not all story ends with bad ending right🥰 most of it was happy ending, and in was thinking na of there's a problem there's you that is could tell everything what was happening and you just there listening and comforting me and my childish side i don't even know how i would repay you for what have you done so many good things in my life it's because of you in making a good decisions🥰 and thank you for all of it🤝🤞🏻
+
+  </p>
+</div>
+
+<audio id="song" src="iwannagoback.mp3" loop></audio>
+
+<script>
+const correct = '0728';
+let input = '';
+const boxes = document.querySelectorAll('.box');
+const song = document.getElementById('song');
+const emojis = ['🎂','🎉','🎊','🍾','🎁','🎈','🪩','🥳'];
+
+function spawnEmoji(x, y) {
+  const e = document.createElement('div');
+  e.className = 'emoji';
+  e.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+  e.style.left = x + 'px';
+  e.style.top = y + 'px';
+  document.body.appendChild(e);
+  setTimeout(() => e.remove(), 1500);
+}
+
+function press(num) {
+  if (input.length >= 4) return;
+
+  input += num;
+  boxes[input.length - 1].textContent = num;
+  boxes[input.length - 1].classList.add('filled');
+  spawnEmoji(innerWidth/2, innerHeight/2);
+
+  if (input.length === 4) {
+    input === correct ? setTimeout(unlock, 300) : setTimeout(wrong, 300);
+  }
+}
+
+function wrong() {
+  const lock = document.getElementById('lockScreen');
+  lock.classList.add('shake');
+  navigator.vibrate?.(200); // phone vibration (if supported)
+  setTimeout(() => lock.classList.remove('shake'), 400);
+  reset();
+}
+
+function reset() {
+  input = '';
+  boxes.forEach(b => {
+    b.textContent = '';
+    b.classList.remove('filled');
+  });
+}
+
+function clearCode() { reset(); }
+
+function unlock() {
+  const lock = document.getElementById('lockScreen');
+  lock.classList.add('unlock-anim');
+
+  for (let i = 0; i < 20; i++) {
+    spawnEmoji(Math.random()*innerWidth, Math.random()*innerHeight);
+  }
+
+  setTimeout(() => {
+    lock.classList.add('hidden');
+    document.getElementById('mailScreen').classList.remove('hidden');
+    song.play();
+  }, 600);
+}
+
+function openMail() {
+  document.getElementById('mailScreen').classList.add('hidden');
+  document.getElementById('messageScreen').classList.remove('hidden');
+}
+</script>
+
+</body>
+</html>
